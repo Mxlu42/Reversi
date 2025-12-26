@@ -1,6 +1,5 @@
 from move import Move
 from player import Player
-import player
 
 class Playboard():              # class that will manage the playboard and everything related to it
     def __init__(self):
