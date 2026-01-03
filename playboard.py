@@ -40,44 +40,44 @@ class Playboard():              # class that will manage the playboard and every
         a = 0
         for i in range(-1,2):
             for j in range(-1,2):
-                if self.playboard[self.row+i][self.col+j] == opposing_player:
+                adj_row = self.row + i
+                adj_col = self.col + j
+                if not (0 <= adj_row < 8 and 0 <= adj_col < 8):
+                    continue
+                    
+                if self.playboard[adj_row][adj_col] == opposing_player:
                     case = i, j
-                    if case[0] == 0:
+                    if case[0] == 0: # turning 0 into 1 for the loops
                         b = 1
                     if case[1] == 0:
                         a = 1
                     else:
                         b = i
                         a = j
-                    if self.playboard[self.row +i+b][self.col + j+a] == player:
-                        print('Move is valid')
-                    elif self.playboard[self.row+i+b][self.col+j+a] == None:
-                        print('Move is invalid')
-                    elif self.playboard[self.row+i+b][self.col+j+a] == opposing_player:
-                        step = 2  # because step=1 is the neighbor we already checked
+                    
+                    next_row = self.row + i + b
+                    next_col = self.col + j + a
+                    if not (0 <= next_row < 8 and 0 <= next_col < 8):
+                        continue
+                        
+                    if self.playboard[next_row][next_col] == player:
+                        return (i, j)  # valid move
+                    elif self.playboard[next_row][next_col] == None:
+                        pass  # Move is invalid
+                    elif self.playboard[next_row][next_col] == opposing_player:
+                        step = 2 
                         while True:
-                            nr = self.col + i*step
-                            nc = self.row + j*step
+                            check_row = self.row + i*step  
+                            check_col = self.col + j*step  
 
-                            if not (0 <= nr < 8 and 0 <= nc < 8):
+                            if not (0 <= check_row < 8 and 0 <= check_col < 8):
                                 break
 
-                            if self.playboard[nr][nc] is None:
-                                print("Move is invalid")
-                                break
+                            if self.playboard[check_row][check_col] is None:
+                                break  # Move is invalid
 
-                            if self.playboard[nr][nc] == player:
-                                print("Move is valid")
+                            if self.playboard[check_row][check_col] == player:
                                 return (i, j)  # direction that makes it valid
                             step += 1
         return case
                 
-if __name__ == '__main__':
-    mov = Move()
-    board = Playboard()
-    pl = Player('W', 0)
-    mov.move_input('64')
-    board.set_move(mov)
-    print(board.check_move('W','B'))
-    board.set_piece(pl.get_player())
-    board.display()
