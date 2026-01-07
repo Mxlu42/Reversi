@@ -62,7 +62,7 @@ class Reversi:
         
         move_strings = [f"{row}{col}" for row, col in valid_moves]
         
-        print("Move format: row+column (e.g., '64' = row 6, column 4)")
+        print("Move format: row+column ( '64' = row 6, column 4)")
         print("Available moves:", ", ".join(sorted(move_strings)))
         
         print(f"Total: {len(valid_moves)} valid move(s)\n")
@@ -197,7 +197,7 @@ class Reversi:
     
     def play(self):
         print("Welcome to Reversi!")
-        print("Black (B) goes first. Enter moves as row+column (e.g., '64' for row 6, column 4)")
+        print("Black (B) goes first. Enter moves as row+column ('64' for row 6, column 4)")
         print("Type 'quit' to exit the game.")
         print("Type 'moves' to see all valid moves for the current player.\n")
         
@@ -230,7 +230,7 @@ class Reversi:
                 continue
             
             if len(move_input) != 2 or not move_input.isdigit():
-                print("Invalid input. Please enter two digits (e.g., '64' for row 6, column 4)")
+                print("Invalid input. Please enter two digits ( '64' for row 6, column 4)")
                 continue
             
             mov = Move()
