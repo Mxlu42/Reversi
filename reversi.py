@@ -1,6 +1,7 @@
 from playboard import Playboard
 from move import Move
 from player import Player
+import tkinter as tk
 
 class Reversi:
     
@@ -195,22 +196,105 @@ class Reversi:
         else:
             return None
     
+    def _show_results_window(self, winner):
+        """Display a Tkinter window with game results."""
+        results_window = tk.Tk()
+        results_window.title("Reversi - Game Over")
+        results_window.geometry("400x250")
+        
+        # Game Over title
+        title_label = tk.Label(
+            results_window,
+            text="GAME OVER",
+            font=("Arial", 20, "bold"),
+            pady=10
+        )
+        title_label.pack()
+        
+        # Final scores
+        black_score = self.player_black.get_score()
+        white_score = self.player_white.get_score()
+        
+        scores_text = f"Black: {black_score}  |  White: {white_score}"
+        scores_label = tk.Label(
+            results_window,
+            text=scores_text,
+            font=("Arial", 14),
+            pady=10
+        )
+        scores_label.pack()
+        
+        # Winner announcement
+        if winner:
+            winner_text = f"Winner: {'Black' if winner == 'B' else 'White'}!"
+            winner_color = "black" if winner == 'B' else "gray"
+        else:
+            winner_text = "It's a tie!"
+            winner_color = "blue"
+        
+        winner_label = tk.Label(
+            results_window,
+            text=winner_text,
+            font=("Arial", 16, "bold"),
+            fg=winner_color,
+            pady=10
+        )
+        winner_label.pack()
+        
+        # Close button
+        close_button = tk.Button(
+            results_window,
+            text="Close",
+            command=results_window.destroy,
+            font=("Arial", 12),
+            padx=20,
+            pady=5
+        )
+        close_button.pack(pady=10)
+        
+        results_window.mainloop()
+    
     def play(self):
         print("Welcome to Reversi!")
         print("Black (B) goes first. Enter moves as row+column ('64' for row 6, column 4)")
         print("Type 'quit' to exit the game.")
         print("Type 'moves' to see all valid moves for the current player.\n")
+
+        # Open the Tkinter window and keep it updated alongside the terminal game
+        self.board.init_ui()
         
         while not self.game_over:
+            # Update scores before displaying
+            self._update_scores()
+            
+            # Get valid moves for current player
+            valid_moves = self.get_valid_moves()
+            
+            # Update the GUI board view with current game state
+            self.board.update_ui(
+                current_player=self.current_player,
+                black_score=self.player_black.get_score(),
+                white_score=self.player_white.get_score(),
+                valid_moves=valid_moves
+            )
+
             self.board.display()
             print(f"\nCurrent player: {self.current_player}")
             print(f"Black: {self.player_black.get_score()} | White: {self.player_white.get_score()}")
             
-            valid_moves = self.get_valid_moves()
-            
             if len(valid_moves) == 0:
                 print(f"No valid moves for {self.current_player}. Switching players...")
                 self.switch_player()
+                
+                # Update UI after switching players
+                self._update_scores()
+                new_valid_moves = self.get_valid_moves()
+                self.board.update_ui(
+                    current_player=self.current_player,
+                    black_score=self.player_black.get_score(),
+                    white_score=self.player_white.get_score(),
+                    valid_moves=new_valid_moves
+                )
                 
                 if self.check_game_over():
                     self.game_over = True
@@ -242,6 +326,16 @@ class Reversi:
                 print(f"Move placed at row {row}, column {col}")
                 self.switch_player()
                 
+                # Update UI after move
+                self._update_scores()
+                valid_moves = self.get_valid_moves()
+                self.board.update_ui(
+                    current_player=self.current_player,
+                    black_score=self.player_black.get_score(),
+                    white_score=self.player_white.get_score(),
+                    valid_moves=valid_moves
+                )
+                
                 if self.check_game_over():
                     self.game_over = True
             else:
@@ -251,7 +345,15 @@ class Reversi:
         print("GAME OVER")
         print("="*50)
         self.board.display()
+        # Final GUI refresh before exiting
         self._update_scores()
+        final_valid_moves = self.get_valid_moves()
+        self.board.update_ui(
+            current_player=self.current_player,
+            black_score=self.player_black.get_score(),
+            white_score=self.player_white.get_score(),
+            valid_moves=final_valid_moves
+        )
         print(f"\nFinal Scores:")
         print(f"Black: {self.player_black.get_score()}")
         print(f"White: {self.player_white.get_score()}")
@@ -261,6 +363,9 @@ class Reversi:
             print(f"\nWinner: {'Black' if winner == 'B' else 'White'}!")
         else:
             print("\nIt's a tie!")
+        
+        # Create a results window showing the winner and final scores
+        self._show_results_window(winner)
 
 
 if __name__ == '__main__':
