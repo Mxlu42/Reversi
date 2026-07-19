@@ -22,27 +22,18 @@ class Reversi:
         self.current_player = self.get_opposing_player()
     
     def is_valid_move(self, row, col):
+        # Must be on the board.
         if not (1 <= row <= 8 and 1 <= col <= 8):
             return False
-        
+
+        # Must be placed on an empty cell.
         if self.board.playboard[row - 1][col - 1] is not None:
             return False
-        
-        mov = Move()
-        mov.row = row
-        mov.column = col
-        self.board.set_move(mov)
-        
-        current = self.current_player
-        opposing = self.get_opposing_player()
-        result = self.board.check_move(current, opposing)
-        
-        if isinstance(result, tuple) and len(result) == 2:
-            i, j = result
-            if -1 <= i <= 1 and -1 <= j <= 1 and (i != 0 or j != 0):
-                return True
-        
-        return False
+
+        # Normal Reversi rule: a move is legal only if it flanks at least one
+        # straight line (any of the 8 directions) of opposing pieces that is
+        # bounded by one of the current player's own pieces.
+        return len(self._get_flip_directions(row, col)) > 0
     
     def get_valid_moves(self):
         valid_moves = []
